@@ -1,6 +1,6 @@
 This file is dedicated to my Thesis project within the Applied Social & Health Psychology (ASHP) program at Colorado State UNiversity. 
 
-I, Neil Yetz, am set to propose at the end of the Fall 2020 semester and defend during the Spring of 2019. 
+I, Neil Yetz, am set to propose at the end of the Fall 2020 semester and defend during the Spring of 2020. 
 
 A quick summary of the project:
 
