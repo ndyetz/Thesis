@@ -1,0 +1,423 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+#Clear environment
+```{r}
+rm(list =ls())
+```
+
+
+# load libraries
+```{r}
+library(tidyverse)
+```
+#Read in data
+```{r}
+#nets   <- readRDS("ALL_NETWORKS.RDS")
+survey <- read_csv("Allwide.csv")
+el     <- read_csv("SN_Edgelist.csv")
+```
+
+# Kids only
+```{r}
+el_kids <- el %>% 
+  filter(str_detect(Sender_Final_ID  , "K") == TRUE, 
+         str_detect(Receiver_Final_ID, "K") == TRUE)
+```
+## Connection strengths
+```{r, message = FALSE}
+
+
+#Outbound relationships
+el_out1 <- el_kids %>% 
+  group_by(Sender_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 1) %>% 
+  summarize(outbound1 = sum(sn2, na.rm = TRUE))
+
+el_out2 <- el_kids %>% 
+  group_by(Sender_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 2) %>% 
+  summarize(outbound2 = sum(sn2, na.rm = TRUE))
+
+el_out3 <- el_kids %>% 
+  group_by(Sender_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 3) %>% 
+  summarize(outbound3 = sum(sn2, na.rm = TRUE))
+
+el_out4 <- el_kids %>% 
+  group_by(Sender_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 4) %>% 
+  summarize(outbound4 = sum(sn2, na.rm = TRUE))
+
+el_out5 <- el_kids %>% 
+  group_by(Sender_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 5) %>% 
+  summarize(outbound5 = sum(sn2, na.rm = TRUE))
+
+
+
+#Inbound relationships
+el_in1 <- el_kids %>% 
+  group_by(Receiver_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 1) %>% 
+  summarize(inbound1 = sum(sn2, na.rm = TRUE))
+
+el_in2 <- el_kids %>% 
+  group_by(Receiver_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 2) %>% 
+  summarize(inbound2 = sum(sn2, na.rm = TRUE))
+
+el_in3 <- el_kids %>% 
+  group_by(Receiver_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 3) %>% 
+  summarize(inbound3 = sum(sn2, na.rm = TRUE))
+
+el_in4 <- el_kids %>% 
+  group_by(Receiver_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 4) %>% 
+  summarize(inbound4 = sum(sn2, na.rm = TRUE))
+
+el_in5 <- el_kids %>% 
+  group_by(Receiver_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 5) %>% 
+  summarize(inbound5 = sum(sn2, na.rm = TRUE))
+
+
+el_join_out <- el_out1 %>% 
+  left_join(el_out2, by = "Sender_Final_ID") %>% 
+  left_join(el_out3, by = "Sender_Final_ID") %>% 
+  left_join(el_out4, by = "Sender_Final_ID") %>% 
+  left_join(el_out5, by = "Sender_Final_ID")
+
+
+
+el_join_in <- el_in1 %>% 
+  left_join(el_in2, by = "Receiver_Final_ID") %>% 
+  left_join(el_in3, by = "Receiver_Final_ID") %>% 
+  left_join(el_in4, by = "Receiver_Final_ID") %>% 
+  left_join(el_in5, by = "Receiver_Final_ID")
+
+strength_kids <- el_join_in %>% 
+  left_join(el_join_out, by = c("Receiver_Final_ID" = "Sender_Final_ID"))
+
+
+strength_kids <- strength_kids %>% 
+  mutate(Final_ID = str_remove(Receiver_Final_ID, "K")) %>% 
+  select(Final_ID, everything(), -Receiver_Final_ID)
+
+```
+
+
+
+## surveys
+```{r}
+survey_kids <- survey %>% 
+  filter(is.na(staff_nomentee), is.na(no_start), is.na(date_dropped), mfcond == 0, kconsent == 1) %>% 
+  select(Final_ID, 
+         mentee_male, 
+         mfcond, 
+         starts_with("k") |
+         starts_with("p")) %>% 
+  select(Final_ID, 
+         mentee_male,
+         mfcond,
+         contains("dlq"), 
+         contains("cesd"), 
+         contains("asp"),
+         contains("blng"), 
+         contains("anger"),
+         contains("dessa"),
+         contains("income"),
+         -contains("k6"),
+         -contains("p1"),
+         -contains("p2")
+         )
+```
+
+## Calculate measures
+### Belongingness
+```{r}
+
+survey_kids$belong_0 <- rowMeans(survey_kids[,c("k0blng_1", "k0blng_2", "k0blng_3", "k0blng_4", "k0blng_5")], na.rm = TRUE)
+survey_kids$belong_2 <- rowMeans(survey_kids[,c("k2blng_1", "k2blng_2", "k2blng_3", "k2blng_4", "k2blng_5")], na.rm = TRUE)
+survey_kids$belong_3 <- rowMeans(survey_kids[,c("k3blng_1", "k3blng_2", "k3blng_3", "k3blng_4", "k3blng_5")], na.rm = TRUE)
+survey_kids$belong_4 <- rowMeans(survey_kids[,c("k4blng_1", "k4blng_2", "k4blng_3", "k4blng_4", "k4blng_5")], na.rm = TRUE)
+survey_kids$belong_5 <- rowMeans(survey_kids[,c("k5blng_1", "k5blng_2", "k5blng_3", "k5blng_4", "k5blng_5")], na.rm = TRUE)
+
+```
+
+
+### Delinquency
+```{r}
+survey_kids$dlq_0 <- rowMeans(survey_kids[,c("k0dlq_1", "k0dlq_2","k0dlq_3", "k0dlq_4", "k0dlq_5", "k0dlq_6", "k0dlq_7", "k0dlq_8", 
+                                         "k0dlq_9", "k0dlq_10")], na.rm = TRUE)
+survey_kids$dlq_5 <- rowMeans(survey_kids[,c("k5dlq_1", "k5dlq_2","k5dlq_3", "k5dlq_4", "k5dlq_5", "k5dlq_6", "k5dlq_7", "k5dlq_8", 
+                                         "k5dlq_9", "k5dlq_10")], na.rm = TRUE)
+```
+
+
+### CESD
+```{r}
+survey_kids$cesd_0 <- rowMeans(survey_kids[,c("k0cesd_1", "k0cesd_2", "k0cesd_3", "k0cesd_4", "k0cesd_5", "k0cesd_6", "k0cesd_8",
+                                          "k0cesd_9", "k0cesd_10")], na.rm = TRUE)
+survey_kids$cesd_5 <- rowMeans(survey_kids[,c("k5cesd_1", "k5cesd_2", "k5cesd_3", "k5cesd_4", "k5cesd_5", "k5cesd_6", "k5cesd_8",
+                                          "k5cesd_9", "k5cesd_10")], na.rm = TRUE)
+```
+
+### Academic aspirations
+```{r}
+survey_kids$asp_0 <- rowMeans(survey_kids[,c("k0asp_1", "k0asp_2", "k0asp_3")], na.rm = TRUE)
+survey_kids$asp_5 <- rowMeans(survey_kids[,c("k5asp_1", "k5asp_2", "k5asp_3")], na.rm = TRUE)
+```
+
+
+### Anger
+```{r}
+survey_kids$anger_0 <- rowMeans(survey_kids[,c("k0anger_1", "k0anger_2", "k0anger_3")], na.rm = TRUE)
+survey_kids$anger_5 <- rowMeans(survey_kids[,c("k5anger_1", "k5anger_2", "k5anger_3")], na.rm = TRUE)
+```
+
+### DESSA
+```{r}
+survey_kids$dessa_0 <- rowMeans(survey_kids[,c("p0dessa_1",  "p0dessa_2", "p0dessa_3", "p0dessa_4",  "p0dessa_5", "p0dessa_6",  "p0dessa_7", "p0dessa_8", "p0dessa_9",  "p0dessa_10", "p0dessa_11", "p0dessa_12", "p0dessa_13",  "p0dessa_14", "p0dessa_15",  "p0dessa_16", "p0dessa_17", "p0dessa_18" , "p0dessa_19" , "p0dessa_20",  "p0dessa_21" , "p0dessa_22",  "p0dessa_23",  "p0dessa_24" , "p0dessa_25",  "p0dessa_26" , "p0dessa_27" , "p0dessa_28" , "p0dessa_29" , "p0dessa_30" , "p0dessa_31",  "p0dessa_32",  "p0dessa_33",  "p0dessa_34" , "p0dessa_35" , "p0dessa_36" , "p0dessa_37",  "p0dessa_38",  "p0dessa_39", "p0dessa_40",  "p0dessa_41",  "p0dessa_42" , "p0dessa_43",  "p0dessa_44",  "p0dessa_45",  "p0dessa_46",  "p0dessa_47",  "p0dessa_48",  "p0dessa_49",  "p0dessa_50",  "p0dessa_51",  "p0dessa_52",  "p0dessa_53",  "p0dessa_54",  "p0dessa_55",  "p0dessa_56",  "p0dessa_57",  "p0dessa_58",  "p0dessa_59",  "p0dessa_60",  "p0dessa_61",  "p0dessa_62",  "p0dessa_63",  "p0dessa_64",  "p0dessa_65",  "p0dessa_66",  "p0dessa_67",  "p0dessa_68",  "p0dessa_69",  "p0dessa_70",  "p0dessa_71",  "p0dessa_72",  "p0dessa_73",  "p0dessa_74",  "p0dessa_75",  "p0dessa_76")], 
+                             na.rm = TRUE)
+```
+
+
+## Rename income
+```{r}
+survey_kids <- survey_kids %>% 
+  rename(income = p0income)
+```
+
+## Remove all single items
+```{r}
+survey_kids <- survey_kids %>% 
+  select(-starts_with("p0"),
+         -starts_with("P2"),
+         -starts_with("k0"),
+         -starts_with("k1"),
+         -starts_with("k2"),
+         -starts_with("k3"),
+         -starts_with("k4"),
+         -starts_with("k5")
+         )
+```
+
+
+
+## Merge surveys & Strength
+```{r}
+
+kid_final <- survey_kids %>% 
+  left_join(strength_kids, by = "Final_ID") 
+
+```
+
+
+# All mentors
+```{r}
+
+
+el_mens_out <- el %>% 
+  filter(str_detect(Receiver_Final_ID, "M") == TRUE,
+         str_detect(Sender_Final_ID  , "K") == TRUE)
+
+el_mens_in <- el %>% 
+  filter(str_detect(Receiver_Final_ID, "K") == TRUE,
+         str_detect(Sender_Final_ID  , "M") == TRUE)
+
+
+```
+
+```{r, message = FALSE}
+
+#Outbound relationships
+el_out1 <- el_mens_out %>% 
+  group_by(Sender_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 1) %>% 
+  summarize(outbound1 = sum(sn2, na.rm = TRUE))
+
+el_out2 <- el_mens_out %>% 
+  group_by(Sender_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 2) %>% 
+  summarize(outbound2 = sum(sn2, na.rm = TRUE))
+
+el_out3 <- el_mens_out %>% 
+  group_by(Sender_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 3) %>% 
+  summarize(outbound3 = sum(sn2, na.rm = TRUE))
+
+el_out4 <- el_mens_out %>% 
+  group_by(Sender_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 4) %>% 
+  summarize(outbound4 = sum(sn2, na.rm = TRUE))
+
+el_out5 <- el_mens_out %>% 
+  group_by(Sender_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 5) %>% 
+  summarize(outbound5 = sum(sn2, na.rm = TRUE))
+
+
+
+#Inbound relationships
+el_in1 <- el_mens_in %>% 
+  group_by(Receiver_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 1) %>% 
+  summarize(inbound1 = sum(sn2, na.rm = TRUE))
+
+el_in2 <- el_mens_in %>% 
+  group_by(Receiver_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 2) %>% 
+  summarize(inbound2 = sum(sn2, na.rm = TRUE))
+
+el_in3 <- el_mens_in %>% 
+  group_by(Receiver_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 3) %>% 
+  summarize(inbound3 = sum(sn2, na.rm = TRUE))
+
+el_in4 <- el_mens_in %>% 
+  group_by(Receiver_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 4) %>% 
+  summarize(inbound4 = sum(sn2, na.rm = TRUE))
+
+el_in5 <- el_mens_in %>% 
+  group_by(Receiver_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 5) %>% 
+  summarize(inbound5 = sum(sn2, na.rm = TRUE))
+
+
+el_join_out <- el_out1 %>% 
+  left_join(el_out2, by = "Sender_Final_ID") %>% 
+  left_join(el_out3, by = "Sender_Final_ID") %>% 
+  left_join(el_out4, by = "Sender_Final_ID") %>% 
+  left_join(el_out5, by = "Sender_Final_ID")
+
+
+
+el_join_in <- el_in1 %>% 
+  left_join(el_in2, by = "Receiver_Final_ID") %>% 
+  left_join(el_in3, by = "Receiver_Final_ID") %>% 
+  left_join(el_in4, by = "Receiver_Final_ID") %>% 
+  left_join(el_in5, by = "Receiver_Final_ID")
+
+strength_mens <- el_join_in %>% 
+  left_join(el_join_out, by = c("Receiver_Final_ID" = "Sender_Final_ID"))
+
+
+strength_mens <- strength_mens %>% 
+  mutate(Final_ID = str_remove(Receiver_Final_ID, "K")) %>% 
+  select(Final_ID, everything(), -Receiver_Final_ID)
+```
+
+
+
+```{r}
+mens_final <- survey_kids %>% 
+  left_join(strength_mens, by = "Final_ID") 
+```
+
+
+
+
+
+# Primary mentor
+```{r}
+el_pmens_out <- el %>% 
+  filter(str_detect(Receiver_Final_ID, "M") == TRUE,
+         str_detect(Sender_Final_ID  , "K") == TRUE) %>% 
+  mutate(Receiver_Final_ID = str_remove(Receiver_Final_ID, "M"),
+         Sender_Final_ID   = str_remove(Sender_Final_ID, "K")) %>% 
+  filter(Sender_Final_ID == Receiver_Final_ID)
+
+el_pmens_in <- el %>% 
+  filter(str_detect(Receiver_Final_ID, "K") == TRUE,
+         str_detect(Sender_Final_ID  , "M") == TRUE) %>% 
+    mutate(Receiver_Final_ID = str_remove(Receiver_Final_ID, "K"),
+         Sender_Final_ID   = str_remove(Sender_Final_ID, "M")) %>% 
+  filter(Sender_Final_ID == Receiver_Final_ID)
+
+
+
+#Outbound relationships
+el_out1 <- el_pmens_out %>% 
+  group_by(Sender_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 1) %>% 
+  summarize(outbound1 = sum(sn2, na.rm = TRUE))
+
+el_out2 <- el_pmens_out %>% 
+  group_by(Sender_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 2) %>% 
+  summarize(outbound2 = sum(sn2, na.rm = TRUE))
+
+el_out3 <- el_pmens_out %>% 
+  group_by(Sender_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 3) %>% 
+  summarize(outbound3 = sum(sn2, na.rm = TRUE))
+
+el_out4 <- el_pmens_out %>% 
+  group_by(Sender_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 4) %>% 
+  summarize(outbound4 = sum(sn2, na.rm = TRUE))
+
+el_out5 <- el_pmens_out %>% 
+  group_by(Sender_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 5) %>% 
+  summarize(outbound5 = sum(sn2, na.rm = TRUE))
+
+
+
+#Inbound relationships
+el_in1 <- el_pmens_in %>% 
+  group_by(Receiver_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 1) %>% 
+  summarize(inbound1 = sum(sn2, na.rm = TRUE))
+
+el_in2 <- el_pmens_in %>% 
+  group_by(Receiver_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 2) %>% 
+  summarize(inbound2 = sum(sn2, na.rm = TRUE))
+
+el_in3 <- el_pmens_in %>% 
+  group_by(Receiver_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 3) %>% 
+  summarize(inbound3 = sum(sn2, na.rm = TRUE))
+
+el_in4 <- el_pmens_in %>% 
+  group_by(Receiver_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 4) %>% 
+  summarize(inbound4 = sum(sn2, na.rm = TRUE))
+
+el_in5 <- el_pmens_in %>% 
+  group_by(Receiver_Final_ID) %>% 
+  filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 5) %>% 
+  summarize(inbound5 = sum(sn2, na.rm = TRUE))
+
+
+el_join_out <- el_out1 %>% 
+  left_join(el_out2, by = "Sender_Final_ID") %>% 
+  left_join(el_out3, by = "Sender_Final_ID") %>% 
+  left_join(el_out4, by = "Sender_Final_ID") %>% 
+  left_join(el_out5, by = "Sender_Final_ID")
+
+
+
+el_join_in <- el_in1 %>% 
+  left_join(el_in2, by = "Receiver_Final_ID") %>% 
+  left_join(el_in3, by = "Receiver_Final_ID") %>% 
+  left_join(el_in4, by = "Receiver_Final_ID") %>% 
+  left_join(el_in5, by = "Receiver_Final_ID")
+
+strength_pmens <- el_join_in %>% 
+  left_join(el_join_out, by = c("Receiver_Final_ID" = "Sender_Final_ID")) %>% 
+  rename(Final_ID = Receiver_Final_ID)
+
+```
+
+
+```{r}
+pmens_final <- survey_kids %>% 
+  left_join(strength_pmens, by = "Final_ID") 
+```
