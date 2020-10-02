@@ -1,0 +1,185 @@
+---
+title: "Thesis Mediation models: Youth to mentors"
+output: 
+  html_notebook:
+    toc: yes
+    toc_float: yes
+---
+
+# Introduction
+This R notebook is in relation to part 2 of Neil Yetz's Thesis. In this notebook, Run a series of mediation models to see if belongingness serves as a mediator between inbound/outbound connections and several program outcomes (Academic aspirations[asp], Depression[dep], Anger[anger], and delinquency[dlq]).
+
+This notebook utilizes the data of inbound and outbound connections that youth feel with their ***ANY MENTOR***
+
+
+# Clear environment
+```{r}
+rm(list = ls())
+```
+
+
+# Load libraries
+```{r, message = FALSE}
+library(tidyverse)
+library(olsrr)
+library(psych)
+```
+
+# Read in data
+```{r, message = FALSE}
+mens <- read_csv("../Data/Final_datasets/mens_final.csv")
+```
+
+# Factor income (For dummy code)
+```{r}
+mens <- mutate(mens, income = as.factor(income))
+```
+
+
+# describe data
+```{r}
+describe(mens)
+```
+
+
+# Inbound Models
+## Model 1 kids: Academic aspriation
+### Model.xy (nonsig)
+```{r}
+model.xy <- lm(asp_5 ~ inbound4 + kage +  mentee_male + income + dessa_0 + asp_0, data=mens)
+ols_regress(model.xy)
+```
+### Model.xm (nonsig)
+```{r}
+model.xm <- lm(belong_4 ~ inbound4 + kage +  mentee_male + income + dessa_0 + asp_0 , data=mens)
+ols_regress(model.xm)
+```
+
+### Model.xmy (Did not run)
+
+
+## Model 2 kids: Depression
+### Model.xy (nonsig)
+```{r}
+model.xy <- lm(cesd_5 ~ inbound4 + kage +  mentee_male + income + dessa_0 + cesd_0, data=mens)
+ols_regress(model.xy)
+```
+### Model.xm (nonsig)
+```{r}
+model.xm <- lm(belong_4 ~ inbound4 + kage +  mentee_male + income + dessa_0 + cesd_0 , data=mens)
+ols_regress(model.xm)
+```
+
+### Model.xmy (Did not run)
+
+
+
+## Model 3 kids: Anger
+### Model.xy (nonsig)
+```{r}
+model.xy <- lm(anger_5 ~ inbound4 + kage +  mentee_male + income + dessa_0 + anger_0, data=mens)
+ols_regress(model.xy)
+```
+### Model.xm (nonsig)
+```{r}
+model.xm <- lm(belong_4 ~ inbound4 + kage +  mentee_male + income + dessa_0 + cesd_0 , data=mens)
+ols_regress(model.xm)
+```
+
+### Model.xmy (Did not run)
+
+## Model 4 kids: Delinquency
+### Model.xy (nonsig)
+```{r}
+model.xy <- lm(dlq_5 ~ inbound4 + kage +  mentee_male + income + dessa_0 + dlq_0, data=mens)
+ols_regress(model.xy)
+```
+### Model.xm (nonsig)
+```{r}
+model.xm <- lm(belong_4 ~ inbound4 + kage +  mentee_male + income + dessa_0 + dlq_0 , data=mens)
+ols_regress(model.xm)
+```
+
+### Model.xmy (Did not run)
+
+
+# Outbound Models
+
+## Model 1 kids: Academic aspriation
+### Model.xy (sig)
+```{r}
+model.xy <- lm(asp_5 ~ outbound4 + kage +  mentee_male + income + dessa_0 + asp_0, data=mens)
+ols_regress(model.xy)
+```
+### Model.xm (sig)
+```{r}
+model.xm <- lm(belong_4 ~ outbound4 + kage +  mentee_male + income + dessa_0 + asp_0 , data=mens)
+ols_regress(model.xm)
+```
+
+### Model.xmy (nonsig)
+```{r}
+model.xmy <- lm(asp_5 ~ outbound4 + belong_4 + kage +  mentee_male + income + dessa_0 + asp_0 , data=mens)
+ols_regress(model.xmy)
+```
+
+## Model 2 kids: Depression
+### Model.xy (nonsig)
+```{r}
+model.xy <- lm(cesd_5 ~ outbound4 + kage +  mentee_male + income + dessa_0 + cesd_0, data=mens)
+ols_regress(model.xy)
+```
+### Model.xm (sig)
+```{r}
+model.xm <- lm(belong_4 ~ outbound4 + kage +  mentee_male + income + dessa_0 + cesd_0 , data=mens)
+ols_regress(model.xm)
+```
+
+### Model.xmy (sig mediator)
+```{r}
+model.xmy <- lm(cesd_5 ~ outbound4 + belong_4 + kage +  mentee_male + income + dessa_0 + cesd_0, data=mens)
+ols_regress(model.xmy)
+```
+
+
+## Model 3 kids: Anger
+### Model.xy (nonsig)
+```{r}
+model.xy <- lm(anger_5 ~ outbound4 + kage +  mentee_male + income + dessa_0 + anger_0, data=mens)
+ols_regress(model.xy)
+```
+### Model.xm (sig)
+```{r}
+model.xm <- lm(belong_4 ~ outbound4 + kage +  mentee_male + income + dessa_0 + cesd_0 , data=mens)
+ols_regress(model.xm)
+```
+
+### Model.xmy (nonsig)
+```{r}
+model.xmy <- lm(anger_5 ~ outbound4 + belong_4 + kage +  mentee_male + income + dessa_0 + anger_0, data=mens)
+ols_regress(model.xmy)
+```
+
+
+
+## Model 4 kids: Delinquency
+### Model.xy (nonsig)
+```{r}
+model.xy <- lm(dlq_5 ~ outbound4 + kage +  mentee_male + income + dessa_0 + dlq_0, data=mens)
+ols_regress(model.xy)
+```
+### Model.xm (sig)
+```{r}
+model.xm <- lm(belong_4 ~ outbound4 + kage +  mentee_male + income + dessa_0 + dlq_0 , data=mens)
+ols_regress(model.xm)
+```
+
+### Model.xmy (nonsig)
+```{r}
+model.xmy <- lm(dlq_5 ~ outbound4 + belong_4 + kage +  mentee_male + income + dessa_0 + dlq_0, data=mens)
+ols_regress(model.xmy)
+```
+
+
+
+

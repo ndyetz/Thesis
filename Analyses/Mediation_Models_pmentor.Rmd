@@ -1,0 +1,246 @@
+---
+title: "Thesis Mediation models: Youth to primary mentor"
+output: 
+  html_notebook:
+    toc: yes
+    toc_float: yes
+    toc_depth: 4
+---
+
+# Introduction
+This R notebook is in relation to part 2 of Neil Yetz's Thesis. In this notebook, Run a series of mediation models to see if belongingness serves as a mediator between inbound/outbound connections and several program outcomes (Academic aspirations[asp], Depression[dep], Anger[anger], and delinquency[dlq]).
+
+This notebook utilizes the data of inbound and outbound connections that youth feel with their ***PRIMARY MENTOR***
+
+
+# Clear environment
+```{r}
+rm(list = ls())
+```
+
+
+# Load libraries
+```{r, message = FALSE}
+library(tidyverse)
+library(olsrr)
+library(psych)
+library(RMediation)
+```
+
+# Read in data
+```{r, message = FALSE}
+pmen <- read_csv("../Data/Final_datasets/pmens_final.csv")
+```
+
+# Factor income (For dummy code)
+```{r}
+pmen <- mutate(pmen, income = as.factor(income))
+```
+
+
+# describe data
+```{r}
+describe(pmen)
+```
+
+
+# Inbound Models
+## Model 1 kids: Academic aspriation
+### Model.xy (sig)
+```{r}
+model.xy <- lm(asp_5 ~ inbound4 + kage +  mentee_male + income + dessa_0 + asp_0, data=pmen)
+ols_regress(model.xy)
+```
+### Model.xm (nonsig)
+```{r}
+model.xm <- lm(belong_4 ~ inbound4 + kage +  mentee_male + income + dessa_0 + asp_0 , data=pmen)
+ols_regress(model.xm)
+```
+
+### Model.xmy (sig main predictor)
+```{r}
+model.xmy <- lm(asp_5 ~ inbound4 + belong_4 + kage +  mentee_male + income + dessa_0 + asp_0, data=pmen)
+ols_regress(model.xmy)
+```
+
+## ***Model 2 kids: Depression***
+### Model.xy (sig)
+```{r}
+model.xy <- lm(cesd_5 ~ inbound4 + kage +  mentee_male + income + dessa_0 + cesd_0, data=pmen)
+ols_regress(model.xy)
+```
+### Model.xm (approaching sig)
+```{r}
+model.xm <- lm(belong_4 ~ inbound4 + kage +  mentee_male + income + dessa_0 + cesd_0 , data=pmen)
+ols_regress(model.xm)
+```
+
+### Model.xmy (sig!)
+```{r}
+model.xmy <- lm(cesd_5 ~ inbound4 + belong_4 + kage +  mentee_male + income + dessa_0 + cesd_0, data=pmen)
+ols_regress(model.xmy)
+```
+
+
+#### Pull out a and b paths
+```{r}
+path.a   <- coefficients(model.xm)["inbound4"]
+path.b   <- coefficients(model.xmy)["belong_4"]
+se.path.a<-sqrt(vcov(model.xm)["inbound4","inbound4"])
+se.path.b<-sqrt(vcov(model.xmy)["belong_4","belong_4"])
+
+path.a   
+path.b   
+se.path.a
+se.path.b
+
+
+```
+
+#### Calculate indirect effect
+```{r}
+ab <- path.a*path.b
+ab
+```
+
+
+#### Indirect effect significance test (PRODCLIN;  Non-significant)
+```{r}
+medci(path.a, path.b, se.path.a, se.path.b, alpha = 0.05, plot = TRUE, plotCI = TRUE)
+```
+
+#### Bootstrapping significance
+```{r}
+
+
+library(boot)
+
+
+boot.med <- function(data, indices){
+data <-data[indices,]
+model.xm <- lm(belong_4 ~ inbound4 + kage +  mentee_male + income + dessa_0 + cesd_0 , data=data)
+model.xmy <- lm(cesd_5 ~ inbound4 + belong_4 + kage +  mentee_male + income + dessa_0 + cesd_0, data=data)
+path.a <- coefficients(model.xm)["inbound4"] #the a-path coefficient
+path.b <- coefficients(model.xmy)["belong_4"] #the b-path coefficient
+ab <- path.a*path.b #returns the product of a*b
+return(ab)
+}
+
+medboot<-boot(data=pmen, statistic = boot.med, R = 10000)
+medconfint <- boot.ci(medboot, index=1, conf = (.95), type = "bca")
+print (medconfint)
+plot(medboot)
+```
+
+
+
+
+## Model 3 kids: Anger
+### Model.xy (nonsig)
+```{r}
+model.xy <- lm(anger_5 ~ inbound4 + kage +  mentee_male + income + dessa_0 + anger_0, data=pmen)
+ols_regress(model.xy)
+```
+### Model.xm (nonsig)
+```{r}
+model.xm <- lm(belong_4 ~ inbound4 + kage +  mentee_male + income + dessa_0 + cesd_0 , data=pmen)
+ols_regress(model.xm)
+```
+
+### Model.xmy (Did not run)
+
+## Model 4 kids: Delinquency
+### Model.xy (nonsig)
+```{r}
+model.xy <- lm(dlq_5 ~ inbound4 + kage +  mentee_male + income + dessa_0 + dlq_0, data=pmen)
+ols_regress(model.xy)
+```
+### Model.xm (nonsig)
+```{r}
+model.xm <- lm(belong_4 ~ inbound4 + kage +  mentee_male + income + dessa_0 + dlq_0 , data=pmen)
+ols_regress(model.xm)
+```
+
+### Model.xmy (Did not run)
+
+
+# Outbound Models
+
+## Model 1 kids: Academic aspriation
+### Model.xy (approaching sig)
+```{r}
+model.xy <- lm(asp_5 ~ outbound4 + kage +  mentee_male + income + dessa_0 + asp_0, data=pmen)
+ols_regress(model.xy)
+```
+### Model.xm (sig)
+```{r}
+model.xm <- lm(belong_4 ~ outbound4 + kage +  mentee_male + income + dessa_0 + asp_0 , data=pmen)
+ols_regress(model.xm)
+```
+
+### Model.xmy (nonsig)
+```{r}
+model.xmy <- lm(asp_5 ~ outbound4 + belong_4 + kage +  mentee_male + income + dessa_0 + asp_0 , data=pmen)
+ols_regress(model.xmy)
+```
+
+## Model 2 kids: Depression
+### Model.xy (nonsig)
+```{r}
+model.xy <- lm(cesd_5 ~ outbound4 + kage +  mentee_male + income + dessa_0 + cesd_0, data=pmen)
+ols_regress(model.xy)
+```
+### Model.xm (sig)
+```{r}
+model.xm <- lm(belong_4 ~ outbound4 + kage +  mentee_male + income + dessa_0 + cesd_0 , data=pmen)
+ols_regress(model.xm)
+```
+
+### Model.xmy (sig mediator)
+```{r}
+model.xmy <- lm(cesd_5 ~ outbound4 + belong_4 + kage +  mentee_male + income + dessa_0 + cesd_0, data=pmen)
+ols_regress(model.xmy)
+```
+
+
+## Model 3 kids: Anger
+### Model.xy (nonsig)
+```{r}
+model.xy <- lm(anger_5 ~ outbound4 + kage +  mentee_male + income + dessa_0 + anger_0, data=pmen)
+ols_regress(model.xy)
+```
+### Model.xm (sig)
+```{r}
+model.xm <- lm(belong_4 ~ outbound4 + kage +  mentee_male + income + dessa_0 + cesd_0 , data=pmen)
+ols_regress(model.xm)
+```
+
+### Model.xmy (nonsig)
+```{r}
+model.xmy <- lm(anger_5 ~ outbound4 + belong_4 + kage +  mentee_male + income + dessa_0 + anger_0, data=pmen)
+ols_regress(model.xmy)
+```
+
+
+
+## Model 4 kids: Delinquency
+### Model.xy (nonsig)
+```{r}
+model.xy <- lm(dlq_5 ~ outbound4 + kage +  mentee_male + income + dessa_0 + dlq_0, data=pmen)
+ols_regress(model.xy)
+```
+### Model.xm (sig)
+```{r}
+model.xm <- lm(belong_4 ~ outbound4 + kage +  mentee_male + income + dessa_0 + dlq_0 , data=pmen)
+ols_regress(model.xm)
+```
+
+### Model.xmy (nonsig)
+```{r}
+model.xmy <- lm(dlq_5 ~ outbound4 + belong_4 + kage +  mentee_male + income + dessa_0 + dlq_0, data=pmen)
+ols_regress(model.xmy)
+```
+
+
+
+

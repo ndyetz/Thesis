@@ -121,6 +121,7 @@ survey_kids <- survey %>%
          starts_with("k") |
          starts_with("p")) %>% 
   select(Final_ID, 
+         kage,
          mentee_male,
          mfcond,
          contains("dlq"), 
@@ -324,7 +325,7 @@ mens_final <- survey_kids %>%
 
 
 # Primary mentor
-```{r}
+```{r, message = FALSE}
 el_pmens_out <- el %>% 
   filter(str_detect(Receiver_Final_ID, "M") == TRUE,
          str_detect(Sender_Final_ID  , "K") == TRUE) %>% 
@@ -421,3 +422,33 @@ strength_pmens <- el_join_in %>%
 pmens_final <- survey_kids %>% 
   left_join(strength_pmens, by = "Final_ID") 
 ```
+
+
+
+# Write out datasets
+```{r}
+
+
+kid_final[is.na(kid_final)]     <- NA
+mens_final[is.na(mens_final)]   <- NA
+pmens_final[is.na(pmens_final)] <- NA
+
+
+#
+#write_csv(kid_final,   "Final_datasets/youth_final.csv" , na = "")
+#write_csv(mens_final,  "Final_datasets/mens_final.csv"  , na = "")
+#write_csv(pmens_final, "Final_datasets/pmens_final.csv" , na = "")
+```
+
+
+
+
+
+```{r}
+
+
+```
+
+
+
+
