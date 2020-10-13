@@ -1,6 +1,9 @@
 ---
-title: "Thesis Mediation models: Youth to mentors"
-output: 
+title: 'Thesis Mediation models: Youth to mentors'
+output:
+  html_document:
+    toc: yes
+    df_print: paged
   html_notebook:
     toc: yes
     toc_float: yes
@@ -23,7 +26,36 @@ rm(list = ls())
 library(tidyverse)
 library(olsrr)
 library(psych)
+library(GGally)
 ```
+
+
+# Functions
+```{r}
+
+col_ggpair <- function(data, mapping, method="p", use="pairwise", ...){
+
+              # grab data
+              x <- eval_data_col(data, mapping$x)
+              y <- eval_data_col(data, mapping$y)
+
+              # calculate correlation
+              corr <- cor(x, y, method=method, use=use)
+
+              # calculate colour based on correlation value
+              # Here I have set a correlation of minus one to blue, 
+              # zero to white, and one to red 
+              # Change this to suit: possibly extend to add as an argument of `my_fn`
+              colFn <- colorRampPalette(c("blue", "white", "red"), interpolate ='spline')
+              fill <- colFn(100)[findInterval(corr, seq(-1, 1, length=100))]
+
+              ggally_cor(data = data, mapping = mapping, ...) + 
+                theme_void() +
+                theme(panel.background = element_rect(fill=fill))
+            }
+```
+
+
 
 # Read in data
 ```{r, message = FALSE}
@@ -42,16 +74,26 @@ describe(mens)
 ```
 
 
+```{r, fig.height = 7, fig.width = 7}
+
+mens %>% 
+  dplyr::select(inbound3, outbound3, belong_4, contains("diff")) %>% 
+  filter(complete.cases(.)) %>% 
+  ggpairs(progress = FALSE,
+          upper = list(continuous = col_ggpair))
+```
+
+
 # Inbound Models
 ## Model 1 kids: Academic aspriation
 ### Model.xy (nonsig)
 ```{r}
-model.xy <- lm(asp_5 ~ inbound4 + kage +  mentee_male + income + dessa_0 + asp_0, data=mens)
+model.xy <- lm(asp_diff ~ inbound3 + kage +  mentee_male + income + dessa_0  , data=mens)
 ols_regress(model.xy)
 ```
 ### Model.xm (nonsig)
 ```{r}
-model.xm <- lm(belong_4 ~ inbound4 + kage +  mentee_male + income + dessa_0 + asp_0 , data=mens)
+model.xm <- lm(belong_4 ~ inbound3 + kage +  mentee_male + income + dessa_0   , data=mens)
 ols_regress(model.xm)
 ```
 
@@ -61,12 +103,12 @@ ols_regress(model.xm)
 ## Model 2 kids: Depression
 ### Model.xy (nonsig)
 ```{r}
-model.xy <- lm(cesd_5 ~ inbound4 + kage +  mentee_male + income + dessa_0 + cesd_0, data=mens)
+model.xy <- lm(cesd_diff ~ inbound3 + kage +  mentee_male + income + dessa_0  , data=mens)
 ols_regress(model.xy)
 ```
 ### Model.xm (nonsig)
 ```{r}
-model.xm <- lm(belong_4 ~ inbound4 + kage +  mentee_male + income + dessa_0 + cesd_0 , data=mens)
+model.xm <- lm(belong_4 ~ inbound3 + kage +  mentee_male + income + dessa_0   , data=mens)
 ols_regress(model.xm)
 ```
 
@@ -77,12 +119,12 @@ ols_regress(model.xm)
 ## Model 3 kids: Anger
 ### Model.xy (nonsig)
 ```{r}
-model.xy <- lm(anger_5 ~ inbound4 + kage +  mentee_male + income + dessa_0 + anger_0, data=mens)
+model.xy <- lm(anger_diff ~ inbound3 + kage +  mentee_male + income + dessa_0  , data=mens)
 ols_regress(model.xy)
 ```
 ### Model.xm (nonsig)
 ```{r}
-model.xm <- lm(belong_4 ~ inbound4 + kage +  mentee_male + income + dessa_0 + cesd_0 , data=mens)
+model.xm <- lm(belong_4 ~ inbound3 + kage +  mentee_male + income + dessa_0   , data=mens)
 ols_regress(model.xm)
 ```
 
@@ -91,12 +133,12 @@ ols_regress(model.xm)
 ## Model 4 kids: Delinquency
 ### Model.xy (nonsig)
 ```{r}
-model.xy <- lm(dlq_5 ~ inbound4 + kage +  mentee_male + income + dessa_0 + dlq_0, data=mens)
+model.xy <- lm( dlq_diff ~ inbound3 + kage +  mentee_male + income + dessa_0  , data=mens)
 ols_regress(model.xy)
 ```
 ### Model.xm (nonsig)
 ```{r}
-model.xm <- lm(belong_4 ~ inbound4 + kage +  mentee_male + income + dessa_0 + dlq_0 , data=mens)
+model.xm <- lm(belong_4 ~ inbound3 + kage +  mentee_male + income + dessa_0   , data=mens)
 ols_regress(model.xm)
 ```
 
@@ -108,36 +150,36 @@ ols_regress(model.xm)
 ## Model 1 kids: Academic aspriation
 ### Model.xy (sig)
 ```{r}
-model.xy <- lm(asp_5 ~ outbound4 + kage +  mentee_male + income + dessa_0 + asp_0, data=mens)
+model.xy <- lm(asp_diff ~ outbound3 + kage +  mentee_male + income + dessa_0  , data=mens)
 ols_regress(model.xy)
 ```
 ### Model.xm (sig)
 ```{r}
-model.xm <- lm(belong_4 ~ outbound4 + kage +  mentee_male + income + dessa_0 + asp_0 , data=mens)
+model.xm <- lm(belong_4 ~ outbound3 + kage +  mentee_male + income + dessa_0   , data=mens)
 ols_regress(model.xm)
 ```
 
 ### Model.xmy (nonsig)
 ```{r}
-model.xmy <- lm(asp_5 ~ outbound4 + belong_4 + kage +  mentee_male + income + dessa_0 + asp_0 , data=mens)
+model.xmy <- lm(asp_diff ~ outbound3 + belong_4 + kage +  mentee_male + income + dessa_0   , data=mens)
 ols_regress(model.xmy)
 ```
 
 ## Model 2 kids: Depression
 ### Model.xy (nonsig)
 ```{r}
-model.xy <- lm(cesd_5 ~ outbound4 + kage +  mentee_male + income + dessa_0 + cesd_0, data=mens)
+model.xy <- lm(cesd_diff ~ outbound3 + kage +  mentee_male + income + dessa_0  , data=mens)
 ols_regress(model.xy)
 ```
 ### Model.xm (sig)
 ```{r}
-model.xm <- lm(belong_4 ~ outbound4 + kage +  mentee_male + income + dessa_0 + cesd_0 , data=mens)
+model.xm <- lm(belong_4 ~ outbound3 + kage +  mentee_male + income + dessa_0   , data=mens)
 ols_regress(model.xm)
 ```
 
 ### Model.xmy (sig mediator)
 ```{r}
-model.xmy <- lm(cesd_5 ~ outbound4 + belong_4 + kage +  mentee_male + income + dessa_0 + cesd_0, data=mens)
+model.xmy <- lm(cesd_diff ~ outbound3 + belong_4 + kage +  mentee_male + income + dessa_0  , data=mens)
 ols_regress(model.xmy)
 ```
 
@@ -145,18 +187,18 @@ ols_regress(model.xmy)
 ## Model 3 kids: Anger
 ### Model.xy (nonsig)
 ```{r}
-model.xy <- lm(anger_5 ~ outbound4 + kage +  mentee_male + income + dessa_0 + anger_0, data=mens)
+model.xy <- lm(anger_diff ~ outbound3 + kage +  mentee_male + income + dessa_0  , data=mens)
 ols_regress(model.xy)
 ```
 ### Model.xm (sig)
 ```{r}
-model.xm <- lm(belong_4 ~ outbound4 + kage +  mentee_male + income + dessa_0 + cesd_0 , data=mens)
+model.xm <- lm(belong_4 ~ outbound3 + kage +  mentee_male + income + dessa_0   , data=mens)
 ols_regress(model.xm)
 ```
 
 ### Model.xmy (nonsig)
 ```{r}
-model.xmy <- lm(anger_5 ~ outbound4 + belong_4 + kage +  mentee_male + income + dessa_0 + anger_0, data=mens)
+model.xmy <- lm(anger_diff ~ outbound3 + belong_4 + kage +  mentee_male + income + dessa_0  , data=mens)
 ols_regress(model.xmy)
 ```
 
@@ -165,18 +207,18 @@ ols_regress(model.xmy)
 ## Model 4 kids: Delinquency
 ### Model.xy (nonsig)
 ```{r}
-model.xy <- lm(dlq_5 ~ outbound4 + kage +  mentee_male + income + dessa_0 + dlq_0, data=mens)
+model.xy <- lm( dlq_diff ~ outbound3 + kage +  mentee_male + income + dessa_0  , data=mens)
 ols_regress(model.xy)
 ```
 ### Model.xm (sig)
 ```{r}
-model.xm <- lm(belong_4 ~ outbound4 + kage +  mentee_male + income + dessa_0 + dlq_0 , data=mens)
+model.xm <- lm(belong_4 ~ outbound3 + kage +  mentee_male + income + dessa_0   , data=mens)
 ols_regress(model.xm)
 ```
 
 ### Model.xmy (nonsig)
 ```{r}
-model.xmy <- lm(dlq_5 ~ outbound4 + belong_4 + kage +  mentee_male + income + dessa_0 + dlq_0, data=mens)
+model.xmy <- lm( dlq_diff ~ outbound3 + belong_4 + kage +  mentee_male + income + dessa_0  , data=mens)
 ols_regress(model.xmy)
 ```
 

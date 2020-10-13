@@ -131,6 +131,7 @@ survey_kids <- survey %>%
          contains("anger"),
          contains("dessa"),
          contains("income"),
+         contains("mas"),
          -contains("k6"),
          -contains("p1"),
          -contains("p2")
@@ -156,6 +157,11 @@ survey_kids$dlq_0 <- rowMeans(survey_kids[,c("k0dlq_1", "k0dlq_2","k0dlq_3", "k0
                                          "k0dlq_9", "k0dlq_10")], na.rm = TRUE)
 survey_kids$dlq_5 <- rowMeans(survey_kids[,c("k5dlq_1", "k5dlq_2","k5dlq_3", "k5dlq_4", "k5dlq_5", "k5dlq_6", "k5dlq_7", "k5dlq_8", 
                                          "k5dlq_9", "k5dlq_10")], na.rm = TRUE)
+
+# Get diff score
+survey_kids <- survey_kids %>% 
+  mutate(dlq_diff = dlq_5 - dlq_0)
+
 ```
 
 
@@ -165,12 +171,22 @@ survey_kids$cesd_0 <- rowMeans(survey_kids[,c("k0cesd_1", "k0cesd_2", "k0cesd_3"
                                           "k0cesd_9", "k0cesd_10")], na.rm = TRUE)
 survey_kids$cesd_5 <- rowMeans(survey_kids[,c("k5cesd_1", "k5cesd_2", "k5cesd_3", "k5cesd_4", "k5cesd_5", "k5cesd_6", "k5cesd_8",
                                           "k5cesd_9", "k5cesd_10")], na.rm = TRUE)
+
+# Get diff score
+survey_kids <- survey_kids %>% 
+  mutate(cesd_diff = cesd_5 - cesd_0)
+
 ```
 
 ### Academic aspirations
 ```{r}
 survey_kids$asp_0 <- rowMeans(survey_kids[,c("k0asp_1", "k0asp_2", "k0asp_3")], na.rm = TRUE)
 survey_kids$asp_5 <- rowMeans(survey_kids[,c("k5asp_1", "k5asp_2", "k5asp_3")], na.rm = TRUE)
+
+
+# Get diff score
+survey_kids <- survey_kids %>% 
+  mutate(asp_diff = asp_5 - asp_0)
 ```
 
 
@@ -178,6 +194,11 @@ survey_kids$asp_5 <- rowMeans(survey_kids[,c("k5asp_1", "k5asp_2", "k5asp_3")], 
 ```{r}
 survey_kids$anger_0 <- rowMeans(survey_kids[,c("k0anger_1", "k0anger_2", "k0anger_3")], na.rm = TRUE)
 survey_kids$anger_5 <- rowMeans(survey_kids[,c("k5anger_1", "k5anger_2", "k5anger_3")], na.rm = TRUE)
+
+# Get diff score
+survey_kids <- survey_kids %>% 
+  mutate(anger_diff = anger_5 - anger_0)
+
 ```
 
 ### DESSA
@@ -185,6 +206,24 @@ survey_kids$anger_5 <- rowMeans(survey_kids[,c("k5anger_1", "k5anger_2", "k5ange
 survey_kids$dessa_0 <- rowMeans(survey_kids[,c("p0dessa_1",  "p0dessa_2", "p0dessa_3", "p0dessa_4",  "p0dessa_5", "p0dessa_6",  "p0dessa_7", "p0dessa_8", "p0dessa_9",  "p0dessa_10", "p0dessa_11", "p0dessa_12", "p0dessa_13",  "p0dessa_14", "p0dessa_15",  "p0dessa_16", "p0dessa_17", "p0dessa_18" , "p0dessa_19" , "p0dessa_20",  "p0dessa_21" , "p0dessa_22",  "p0dessa_23",  "p0dessa_24" , "p0dessa_25",  "p0dessa_26" , "p0dessa_27" , "p0dessa_28" , "p0dessa_29" , "p0dessa_30" , "p0dessa_31",  "p0dessa_32",  "p0dessa_33",  "p0dessa_34" , "p0dessa_35" , "p0dessa_36" , "p0dessa_37",  "p0dessa_38",  "p0dessa_39", "p0dessa_40",  "p0dessa_41",  "p0dessa_42" , "p0dessa_43",  "p0dessa_44",  "p0dessa_45",  "p0dessa_46",  "p0dessa_47",  "p0dessa_48",  "p0dessa_49",  "p0dessa_50",  "p0dessa_51",  "p0dessa_52",  "p0dessa_53",  "p0dessa_54",  "p0dessa_55",  "p0dessa_56",  "p0dessa_57",  "p0dessa_58",  "p0dessa_59",  "p0dessa_60",  "p0dessa_61",  "p0dessa_62",  "p0dessa_63",  "p0dessa_64",  "p0dessa_65",  "p0dessa_66",  "p0dessa_67",  "p0dessa_68",  "p0dessa_69",  "p0dessa_70",  "p0dessa_71",  "p0dessa_72",  "p0dessa_73",  "p0dessa_74",  "p0dessa_75",  "p0dessa_76")], 
                              na.rm = TRUE)
 ```
+
+
+```{r}
+
+survey_kids <- survey_kids %>% 
+  mutate(k3mas_3 =  6 - k3mas_3,
+         k3mas_6 =  6 - k3mas_6,
+         k3mas_9 =  6 - k3mas_9,
+         k3mas_12 = 6 - k3mas_12,
+         k3mas_13 = 6 - k3mas_13,
+         k3mas_14 = 6 - k3mas_14,
+         k3mas_15 = 6 - k3mas_15,
+         k3mas_16 = 6 - k3mas_16)
+
+
+survey_kids$mas_3 <- rowMeans(survey_kids[,c("k3mas_1", "k3mas_2", "k3mas_3", "k3mas_4", "k3mas_5", "k3mas_6", "k3mas_7", "k3mas_8", "k3mas_9", "k3mas_10", "k3mas_11", "k3mas_12", "k3mas_13", "k3mas_14", "k3mas_15")], na.rm = TRUE)
+```
+
 
 
 ## Rename income
@@ -434,19 +473,10 @@ mens_final[is.na(mens_final)]   <- NA
 pmens_final[is.na(pmens_final)] <- NA
 
 
-#
+
 #write_csv(kid_final,   "Final_datasets/youth_final.csv" , na = "")
 #write_csv(mens_final,  "Final_datasets/mens_final.csv"  , na = "")
 #write_csv(pmens_final, "Final_datasets/pmens_final.csv" , na = "")
-```
-
-
-
-
-
-```{r}
-
-
 ```
 
 
