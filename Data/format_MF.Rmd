@@ -20,25 +20,12 @@ survey <- read_csv("Allwide.csv")
 el     <- read_csv("SN_Edgelist.csv")
 ```
 
-
-```{r}
-survey <- survey %>% 
-  filter(!is.na(m3start))
-```
-
-
-
-
-
 # Kids only
 ```{r}
 el_kids <- el %>% 
   filter(str_detect(Sender_Final_ID  , "K") == TRUE, 
          str_detect(Receiver_Final_ID, "K") == TRUE)
-
-
 ```
-
 ## Connection strengths
 ```{r, message = FALSE}
 
@@ -47,32 +34,27 @@ el_kids <- el %>%
 el_out1 <- el_kids %>% 
   group_by(Sender_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 1) %>% 
-  summarize(outbound1 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(outbound1 = ifelse(outbound1 == 0, NA, outbound1))
+  summarize(outbound1 = sum(sn2, na.rm = TRUE))
 
 el_out2 <- el_kids %>% 
   group_by(Sender_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 2) %>% 
-  summarize(outbound2 = sum(sn2, na.rm = TRUE))%>% 
-  mutate(outbound2 = ifelse(outbound2 == 0, NA, outbound2))
+  summarize(outbound2 = sum(sn2, na.rm = TRUE))
 
 el_out3 <- el_kids %>% 
   group_by(Sender_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 3) %>% 
-  summarize(outbound3 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(outbound3 = ifelse(outbound3 == 0, NA, outbound3))
+  summarize(outbound3 = sum(sn2, na.rm = TRUE))
 
 el_out4 <- el_kids %>% 
   group_by(Sender_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 4) %>% 
-  summarize(outbound4 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(outbound4 = ifelse(outbound4 == 0, NA, outbound4))
+  summarize(outbound4 = sum(sn2, na.rm = TRUE))
 
 el_out5 <- el_kids %>% 
   group_by(Sender_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 5) %>% 
-  summarize(outbound5 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(outbound5 = ifelse(outbound5 == 0, NA, outbound5))
+  summarize(outbound5 = sum(sn2, na.rm = TRUE))
 
 
 
@@ -80,36 +62,27 @@ el_out5 <- el_kids %>%
 el_in1 <- el_kids %>% 
   group_by(Receiver_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 1) %>% 
-  summarize(inbound1 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(inbound1 = ifelse(inbound1 == 0, NA, inbound1))
+  summarize(inbound1 = sum(sn2, na.rm = TRUE))
 
 el_in2 <- el_kids %>% 
   group_by(Receiver_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 2) %>% 
-  summarize(inbound2 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(inbound2 = ifelse(inbound2 == 0, NA, inbound2))
-
+  summarize(inbound2 = sum(sn2, na.rm = TRUE))
 
 el_in3 <- el_kids %>% 
   group_by(Receiver_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 3) %>% 
-  summarize(inbound3 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(inbound3 = ifelse(inbound3 == 0, NA, inbound3))
-
+  summarize(inbound3 = sum(sn2, na.rm = TRUE))
 
 el_in4 <- el_kids %>% 
   group_by(Receiver_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 4) %>% 
-  summarize(inbound4 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(inbound4 = ifelse(inbound4 == 0, NA, inbound4))
-
+  summarize(inbound4 = sum(sn2, na.rm = TRUE))
 
 el_in5 <- el_kids %>% 
   group_by(Receiver_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 5) %>% 
-  summarize(inbound5 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(inbound5 = ifelse(inbound5 == 0, NA, inbound5))
-
+  summarize(inbound5 = sum(sn2, na.rm = TRUE))
 
 
 el_join_out <- el_out1 %>% 
@@ -141,15 +114,13 @@ strength_kids <- strength_kids %>%
 ## surveys
 ```{r}
 survey_kids <- survey %>% 
-  filter(is.na(staff_nomentee), is.na(no_start), is.na(date_dropped), mfcond == 0, kconsent == 1) %>% 
+  filter(is.na(staff_nomentee), is.na(no_start), is.na(date_dropped), mfcond == 1, kconsent == 1) %>% 
   select(Final_ID, 
          mentee_male, 
          mfcond, 
          starts_with("k") |
-         starts_with("p"),
-         m3start) %>% 
+         starts_with("p")) %>% 
   select(Final_ID, 
-         m3start,
          kage,
          mentee_male,
          mfcond,
@@ -307,33 +278,27 @@ el_mens_in <- el %>%
 el_out1 <- el_mens_out %>% 
   group_by(Sender_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 1) %>% 
-  summarize(outbound1 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(outbound1 = ifelse(outbound1 == 0, NA, outbound1))
-
+  summarize(outbound1 = sum(sn2, na.rm = TRUE))
 
 el_out2 <- el_mens_out %>% 
   group_by(Sender_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 2) %>% 
-  summarize(outbound2 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(outbound2 = ifelse(outbound2 == 0, NA, outbound2))
+  summarize(outbound2 = sum(sn2, na.rm = TRUE))
 
 el_out3 <- el_mens_out %>% 
   group_by(Sender_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 3) %>% 
-  summarize(outbound3 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(outbound3 = ifelse(outbound3 == 0, NA, outbound3))
+  summarize(outbound3 = sum(sn2, na.rm = TRUE))
 
 el_out4 <- el_mens_out %>% 
   group_by(Sender_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 4) %>% 
-  summarize(outbound4 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(outbound4 = ifelse(outbound4 == 0, NA, outbound4))
+  summarize(outbound4 = sum(sn2, na.rm = TRUE))
 
 el_out5 <- el_mens_out %>% 
   group_by(Sender_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 5) %>% 
-  summarize(outbound5 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(outbound5 = ifelse(outbound5 == 0, NA, outbound5))
+  summarize(outbound5 = sum(sn2, na.rm = TRUE))
 
 
 
@@ -341,32 +306,27 @@ el_out5 <- el_mens_out %>%
 el_in1 <- el_mens_in %>% 
   group_by(Receiver_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 1) %>% 
-  summarize(inbound1 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(inbound1 = ifelse(inbound1 == 0, NA, inbound1))
+  summarize(inbound1 = sum(sn2, na.rm = TRUE))
 
 el_in2 <- el_mens_in %>% 
   group_by(Receiver_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 2) %>% 
-  summarize(inbound2 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(inbound2 = ifelse(inbound2 == 0, NA, inbound2))
+  summarize(inbound2 = sum(sn2, na.rm = TRUE))
 
 el_in3 <- el_mens_in %>% 
   group_by(Receiver_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 3) %>% 
-  summarize(inbound3 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(inbound3 = ifelse(inbound3 == 0, NA, inbound3))
+  summarize(inbound3 = sum(sn2, na.rm = TRUE))
 
 el_in4 <- el_mens_in %>% 
   group_by(Receiver_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 4) %>% 
-  summarize(inbound4 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(inbound4 = ifelse(inbound4 == 0, NA, inbound4))
+  summarize(inbound4 = sum(sn2, na.rm = TRUE))
 
 el_in5 <- el_mens_in %>% 
   group_by(Receiver_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 5) %>% 
-  summarize(inbound5 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(inbound5 = ifelse(inbound5 == 0, NA, inbound5))
+  summarize(inbound5 = sum(sn2, na.rm = TRUE))
 
 
 el_join_out <- el_out1 %>% 
@@ -425,32 +385,27 @@ el_pmens_in <- el %>%
 el_out1 <- el_pmens_out %>% 
   group_by(Sender_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 1) %>% 
-  summarize(outbound1 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(outbound1 = ifelse(outbound1 == 0, NA, outbound1))
+  summarize(outbound1 = sum(sn2, na.rm = TRUE))
 
 el_out2 <- el_pmens_out %>% 
   group_by(Sender_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 2) %>% 
-  summarize(outbound2 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(outbound2 = ifelse(outbound2 == 0, NA, outbound2))
+  summarize(outbound2 = sum(sn2, na.rm = TRUE))
 
 el_out3 <- el_pmens_out %>% 
   group_by(Sender_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 3) %>% 
-  summarize(outbound3 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(outbound3 = ifelse(outbound3 == 0, NA, outbound3))
+  summarize(outbound3 = sum(sn2, na.rm = TRUE))
 
 el_out4 <- el_pmens_out %>% 
   group_by(Sender_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 4) %>% 
-  summarize(outbound4 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(outbound4 = ifelse(outbound4 == 0, NA, outbound4))
+  summarize(outbound4 = sum(sn2, na.rm = TRUE))
 
 el_out5 <- el_pmens_out %>% 
   group_by(Sender_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 5) %>% 
-  summarize(outbound5 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(outbound5 = ifelse(outbound5 == 0, NA, outbound5))
+  summarize(outbound5 = sum(sn2, na.rm = TRUE))
 
 
 
@@ -458,32 +413,27 @@ el_out5 <- el_pmens_out %>%
 el_in1 <- el_pmens_in %>% 
   group_by(Receiver_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 1) %>% 
-  summarize(inbound1 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(inbound1 = ifelse(inbound1 == 0, NA, inbound1))
+  summarize(inbound1 = sum(sn2, na.rm = TRUE))
 
 el_in2 <- el_pmens_in %>% 
   group_by(Receiver_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 2) %>% 
-  summarize(inbound2 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(inbound2 = ifelse(inbound2 == 0, NA, inbound2))
+  summarize(inbound2 = sum(sn2, na.rm = TRUE))
 
 el_in3 <- el_pmens_in %>% 
   group_by(Receiver_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 3) %>% 
-  summarize(inbound3 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(inbound3 = ifelse(inbound3 == 0, NA, inbound3))
+  summarize(inbound3 = sum(sn2, na.rm = TRUE))
 
 el_in4 <- el_pmens_in %>% 
   group_by(Receiver_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 4) %>% 
-  summarize(inbound4 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(inbound4 = ifelse(inbound4 == 0, NA, inbound4))
+  summarize(inbound4 = sum(sn2, na.rm = TRUE))
 
 el_in5 <- el_pmens_in %>% 
   group_by(Receiver_Final_ID) %>% 
   filter(Sender_missing == 0, Receiver_Missing == 0, survnum == 5) %>% 
-  summarize(inbound5 = sum(sn2, na.rm = TRUE)) %>% 
-  mutate(inbound5 = ifelse(inbound5 == 0, NA, inbound5))
+  summarize(inbound5 = sum(sn2, na.rm = TRUE))
 
 
 el_join_out <- el_out1 %>% 
@@ -535,62 +485,24 @@ mens_final  <- mens_final  %>% mutate(inbound3 = ifelse(inbound3 == 0, NA, inbou
 pmens_final <- pmens_final %>% mutate(inbound3 = ifelse(inbound3 == 0, NA, inbound3))
 
 
-## Remove NAs -- Outbound
-#kid_final   <- kid_final   %>% filter(!is.na(outbound3))
-#mens_final  <- mens_final  %>% filter(!is.na(outbound3))
-#pmens_final <- pmens_final %>% filter(!is.na(outbound3))
-#
-## Remove NAs -- Inbound
-#kid_final   <- kid_final   %>% filter(!is.na(inbound3))
-#mens_final  <- mens_final  %>% filter(!is.na(inbound3))
-#pmens_final <- pmens_final %>% filter(!is.na(inbound3))
+# Remove NAs -- Outbound
+kid_final   <- kid_final   %>% filter(!is.na(outbound3))
+mens_final  <- mens_final  %>% filter(!is.na(outbound3))
+pmens_final <- pmens_final %>% filter(!is.na(outbound3))
+
+# Remove NAs -- Inbound
+kid_final   <- kid_final   %>% filter(!is.na(inbound3))
+mens_final  <- mens_final  %>% filter(!is.na(inbound3))
+pmens_final <- pmens_final %>% filter(!is.na(inbound3))
 
 
 
 
-write_csv(kid_final,   "Final_datasets/youth_final.csv" , na = "")
-write_csv(mens_final,  "Final_datasets/mens_final.csv"  , na = "")
-write_csv(pmens_final, "Final_datasets/pmens_final.csv" , na = "")
+#write_csv(kid_final,   "Final_datasets/youth_final_MF.csv" , na = "")
+#write_csv(mens_final,  "Final_datasets/mens_final_MF.csv"  , na = "")
+#write_csv(pmens_final, "Final_datasets/pmens_final_MF.csv" , na = "")
 ```
 
-# Number of times Youth did not choose mentor
-```{r}
-
-# Number of times Youth did not choose mentor
-el_week3 <- el %>% 
-    filter(str_detect(Receiver_Final_ID, "M") == TRUE,
-         str_detect(Sender_Final_ID  , "K") == TRUE) %>% 
-    mutate(Receiver_Final_ID = str_remove(Receiver_Final_ID, "M"),
-         Sender_Final_ID   = str_remove(Sender_Final_ID, "K")) %>% 
-  filter(survnum == 3) %>% 
-  filter(Sender_Final_ID == Receiver_Final_ID & is.na(sn2)) %>% 
-  filter(Sender_missing == 0) %>% 
-  filter(Receiver_Missing == 0)
 
 
-el_week3 %>% 
-  group_by(semester) %>% 
-  count()
 
-```
-
-# Number of times Mentor did not choose youth
-```{r}
-
-# Number of times Mentor did not choose youth
-el_week3 <- el %>% 
-    filter(str_detect(Receiver_Final_ID, "K") == TRUE,
-         str_detect(Sender_Final_ID  , "M") == TRUE) %>% 
-    mutate(Receiver_Final_ID = str_remove(Receiver_Final_ID, "K"),
-         Sender_Final_ID   = str_remove(Sender_Final_ID, "M")) %>% 
-  filter(survnum == 3) %>% 
-  filter(Sender_Final_ID == Receiver_Final_ID & is.na(sn2)) %>% 
-  filter(Sender_missing == 0) %>% 
-  filter(Receiver_Missing == 0)
-
-
-el_week3 %>% 
-  group_by(semester) %>% 
-  count()
-
-```

@@ -1,0 +1,52 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Load libraries
+```{r}
+library(igraph)
+library(tidyverse)
+```
+
+
+# Read in network graphs
+```{r}
+net <- readRDS("ALL_NETWORKS.RDS")
+```
+
+
+# F15 Control
+```{r}
+
+edge_density(net$F15$monday$graphs$g3)
+edge_density(net$F15$wednesday$graphs$g3)
+
+```
+
+
+# F16 Control
+```{r}
+edge_density(net$F16$tuesday$graphs$g3)
+edge_density(net$F16$wednesday$graphs$g3)
+
+
+```
+
+
+# S16 Control
+```{r}
+edge_density(net$S16$tuesday$graphs$g3)
+edge_density(net$S16$wednesday$graphs$g3)
+```
+
+
+# S17 Control
+```{r}
+edge_density(net$S17$monday$graphs$g3)
+edge_density(net$S17$thursday$graphs$g3)
+```
+
+
+
+

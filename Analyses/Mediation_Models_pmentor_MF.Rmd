@@ -25,11 +25,11 @@ rm(list = ls())
 
 # Load libraries
 ```{r, message = FALSE}
-library(tidyverse)
 library(olsrr)
 library(psych)
 library(RMediation)
 library(GGally)
+library(tidyverse)
 ```
 
 
@@ -62,7 +62,7 @@ col_ggpair <- function(data, mapping, method="p", use="pairwise", ...){
 
 # Read in data
 ```{r, message = FALSE}
-pmen <- read_csv("../Data/Final_datasets/pmens_final.csv")
+pmen <- read_csv("../Data/Final_datasets/pmens_final_MF.csv")
 ```
 
 # Factor income (For dummy code)
@@ -74,11 +74,6 @@ pmen <- mutate(pmen, income = as.factor(income))
 # describe data
 ```{r}
 describe(pmen)
-```
-```{r}
-pmen <- pmen %>% 
-  filter(!is.na(inbound3)  | inbound3  == 0) %>% 
-  filter(!is.na(outbound3) | outbound3 == 0)
 ```
 
 
@@ -102,6 +97,7 @@ ggplot(pmen, aes(x = inbound3, y = outbound3)) +
 
 ```
 
+
 ```{r, fig.height=12, fig.width=12}
 inbound <- pmen %>% 
   dplyr::select(Final_ID, starts_with("inbound"))
@@ -120,36 +116,6 @@ ggplot(inbound_long, aes(x = inbound, y = value)) +
 
 
 ```
-
-
-```{r, fig.height=12, fig.width=12}
-outbound <- pmen %>% 
-  dplyr::select(Final_ID, starts_with("outbound"))
-
-
-
-outbound_long <- pivot_longer(outbound, cols = c("outbound1", "outbound2", "outbound3", "outbound4", "outbound5"),
-             names_to ="outbound") 
-
-
-
-ggplot(outbound_long, aes(x = outbound, y = value)) +
-  geom_line(aes(group = Final_ID)) +
-  geom_point() +
-  facet_wrap(~Final_ID)
-
-
-```
-
-
-
-
-
-
-
-
-
-
 
 
 

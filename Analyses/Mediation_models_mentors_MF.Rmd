@@ -1,12 +1,12 @@
 ---
 title: 'Thesis Mediation models: Youth to mentors'
 output:
-  html_notebook:
-    toc: yes
-    toc_float: yes
   html_document:
     toc: yes
     df_print: paged
+  html_notebook:
+    toc: yes
+    toc_float: yes
 ---
 
 # Introduction
@@ -68,14 +68,6 @@ mens <- mutate(mens, income = as.factor(income))
 ```
 
 
-```{r}
-mens <- mens %>% 
-  filter(!is.na(inbound3)  | inbound3  == 0) %>% 
-  filter(!is.na(outbound3) | outbound3 == 0)
-```
-
-
-
 # describe data
 ```{r}
 describe(mens)
@@ -91,44 +83,7 @@ mens %>%
           upper = list(continuous = col_ggpair))
 ```
 
-```{r, fig.height=12, fig.width=12}
-inbound <- mens %>% 
-  dplyr::select(Final_ID, starts_with("inbound"))
 
-
-
-inbound_long <- pivot_longer(inbound, cols = c("inbound1", "inbound2", "inbound3", "inbound4", "inbound5"),
-             names_to ="inbound") 
-
-
-
-ggplot(inbound_long, aes(x = inbound, y = value)) +
-  geom_line(aes(group = Final_ID)) +
-  geom_point() +
-  facet_wrap(~Final_ID)
-
-
-```
-
-
-```{r, fig.height=12, fig.width=12}
-outbound <- mens %>% 
-  dplyr::select(Final_ID, starts_with("outbound"))
-
-
-
-outbound_long <- pivot_longer(outbound, cols = c("outbound1", "outbound2", "outbound3", "outbound4", "outbound5"),
-             names_to ="outbound") 
-
-
-
-ggplot(outbound_long, aes(x = outbound, y = value)) +
-  geom_line(aes(group = Final_ID)) +
-  geom_point() +
-  facet_wrap(~Final_ID)
-
-
-```
 
 
 

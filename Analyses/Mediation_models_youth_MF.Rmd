@@ -61,21 +61,12 @@ col_ggpair <- function(data, mapping, method="p", use="pairwise", ...){
 
 # Read in data
 ```{r, message = FALSE}
-youth <- read_csv("../Data/Final_datasets/youth_final.csv")
+youth <- read_csv("../Data/Final_datasets/youth_final_MF.csv")
 ```
 
 # Factor income (For dummy code)
 ```{r}
 youth <- mutate(youth, income = as.factor(income))
-```
-
-
-
-
-```{r}
-youth <- youth %>% 
-  filter(!is.na(inbound3)  | inbound3  == 0) %>% 
-  filter(!is.na(outbound3) | outbound3 == 0)
 ```
 
 
@@ -93,68 +84,6 @@ youth %>%
   ggpairs(progress = FALSE,
           upper = list(continuous = col_ggpair))
 ```
-
-
-
-
-```{r, fig.height=12, fig.width=12}
-inbound <- youth %>% 
-  dplyr::select(Final_ID, starts_with("inbound"))
-
-
-
-inbound_long <- pivot_longer(inbound, cols = c("inbound1", "inbound2", "inbound3", "inbound4", "inbound5"),
-             names_to ="inbound") 
-
-
-
-ggplot(inbound_long, aes(x = inbound, y = value)) +
-  geom_line(aes(group = Final_ID)) +
-  geom_point() +
-  facet_wrap(~Final_ID)
-
-
-```
-
-
-```{r, fig.height=12, fig.width=12}
-outbound <- youth %>% 
-  dplyr::select(Final_ID, starts_with("outbound"))
-
-
-
-outbound_long <- pivot_longer(outbound, cols = c("outbound1", "outbound2", "outbound3", "outbound4", "outbound5"),
-             names_to ="outbound") 
-
-
-
-ggplot(outbound_long, aes(x = outbound, y = value)) +
-  geom_line(aes(group = Final_ID)) +
-  geom_point() +
-  facet_wrap(~Final_ID)
-
-
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
